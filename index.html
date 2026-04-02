@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Study Hub</title>
+    <link rel="stylesheet" href="./css/hub.css" />
+  </head>
+  <body>
+    <div id="hub-shell">
+      <header class="hub-header">
+        <button type="button" id="hub-back" class="hub-back hidden" aria-label="All courses">
+          All courses
+        </button>
+        <span class="hub-title">Study Hub</span>
+        <span id="hub-current" class="hub-current hidden" aria-live="polite"></span>
+      </header>
+
+      <div id="landing" class="landing">
+        <h1>Choose a course</h1>
+        <p>
+          Each course lives under <code>Hubs/StudyHub/pages/</code> (its own copy). Editing originals
+          elsewhere does not change these files — refresh copies here when you want. Add a folder under
+          <code>pages/</code>, then wire it up in <code>Hubs/StudyHub/js/registry.js</code>.
+        </p>
+        <div id="course-grid" class="course-grid" role="list"></div>
+      </div>
+
+      <div id="workspace" class="workspace hidden">
+        <div id="iframe-host" class="iframe-host hidden">
+          <iframe id="course-iframe" title="Course notes" src="about:blank"></iframe>
+        </div>
+
+        <div id="txt-workspace" class="txt-workspace hidden">
+          <div class="main-layout" id="txt-main-layout">
+            <aside class="sidebar" data-txt-sidebar>
+              <nav class="nav">
+                <a href="#" data-chapter="home" class="nav-home active">Home</a>
+              </nav>
+              <div class="sidebar-title">Chapters</div>
+              <nav class="nav" id="txt-chaptersNav" aria-label="Chapters"></nav>
+              <div class="sidebar-actions">
+                <div class="searchWrap">
+                  <label class="sr-only" for="txt-chapterSearch">Filter chapters</label>
+                  <input
+                    id="txt-chapterSearch"
+                    type="search"
+                    placeholder="Filter chapters…"
+                    autocomplete="off"
+                  />
+                </div>
+              </div>
+            </aside>
+            <div class="content-wrapper">
+              <div class="home-screen active" id="txt-home-screen">
+                <div class="home-content">
+                  <div class="home-left">
+                    <h2>About</h2>
+                    <div class="home-intro">
+                      <p id="txt-course-blurb">
+                        Chapter list appears in the sidebar when notes are loaded.
+                      </p>
+                      <p class="muted">
+                        Edit that course’s file under
+                        <code>Hubs/StudyHub/pages/&lt;course&gt;/</code> (e.g.
+                        <code>pages/techplus/notes.js</code>).
+                      </p>
+                    </div>
+                  </div>
+                  <div class="home-right">
+                    <h2 class="toc-title">Table of contents</h2>
+                    <div id="txt-tocFallback" class="muted"></div>
+                  </div>
+                </div>
+              </div>
+              <main class="content" id="txt-content"></main>
+            </div>
+          </div>
+        </div>
+
+        <div id="placeholder-host" class="placeholder-host hidden">
+          <div class="placeholder-card">
+            <h2>Coming soon</h2>
+            <p id="placeholder-text"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+
+    <script src="./js/registry.js"></script>
+    <script src="./pages/techplus/notes.js"></script>
+    <script src="./js/txt-viewer.js"></script>
+    <script src="./js/hub.js"></script>
+  </body>
+</html>
