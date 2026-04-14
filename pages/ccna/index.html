@@ -1,0 +1,1301 @@
+<!--Note to self, change summary from popup to tab under chapter in sidebar-->
+<!-- Study Hub: independent snapshot under pages/ccna/ — changing CCNA_Notes.html elsewhere does not update this file. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCNA Study Notes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0e14;
+            --bg-card: #12171e;
+            --bg-elevated: #1a2129;
+            --accent: #39c5cf;
+            --accent-blue: #58a6ff;
+            --accent-orange: #ff9f43;
+            --accent-purple: #a371f7;
+            --accent-green: #3dd68c;
+            --text: #e6edf3;
+            --text-muted: #7d8a99;
+            --text-soft: #b1bac4;
+            --border: #2a3542;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --glow: rgba(57, 197, 207, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 17px;
+            line-height: 1.7;
+            margin: 0;
+            min-height: 100vh;
+            height: 100vh;
+            background: var(--bg-dark);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle grid/network background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(57, 197, 207, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(57, 197, 207, 0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top header bar */
+        .header {
+            height: 60px;
+            background: linear-gradient(180deg, var(--bg-card) 0%, rgba(18, 23, 30, 0.95) 100%);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+        }
+
+        .brand {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .brand::before {
+            content: '▸';
+            color: var(--accent);
+            font-weight: 400;
+            font-size: 0.9em;
+        }
+
+        .brand:hover {
+            color: var(--accent);
+            transform: translateX(2px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .header-view-chapters {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--accent);
+            text-decoration: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(57, 197, 207, 0.3);
+            transition: background 0.2s;
+        }
+
+        .header-view-chapters:hover {
+            background: rgba(57, 197, 207, 0.1);
+        }
+
+        .header-view-chapters.hidden {
+            display: none;
+        }
+
+        .header-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            background: rgba(57, 197, 207, 0.12);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            border: 1px solid rgba(57, 197, 207, 0.25);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+            font-family: inherit;
+        }
+
+        .header-badge:hover {
+            background: rgba(57, 197, 207, 0.2);
+            transform: scale(1.02);
+        }
+
+        .header-badge:focus {
+            outline: none;
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+
+        .sidebar-actions {
+            margin-top: auto;
+            padding: 1rem 0.75rem 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-actions button {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-actions button:hover {
+            color: var(--text);
+            background: rgba(57, 197, 207, 0.06);
+            border-color: rgba(57, 197, 207, 0.3);
+        }
+
+        .sidebar-actions button.sidebar-summary {
+            display: none;
+        }
+
+        .sidebar-actions button.sidebar-summary.visible {
+            display: block;
+        }
+
+        /* Main layout: sidebar + content (always visible) */
+        .main-layout {
+            display: flex;
+            height: calc(100vh - 60px);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            background: linear-gradient(180deg, var(--bg-card) 0%, rgba(18, 23, 30, 0.98) 100%);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            padding: 0 1.5rem;
+            margin-top: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0 0.75rem;
+        }
+
+        .nav a {
+            padding: 0.7rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 10px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav a:hover {
+            color: var(--text);
+            background: rgba(57, 197, 207, 0.06);
+            transform: translateX(4px);
+        }
+
+        .nav a.active {
+            color: var(--accent);
+            background: rgba(57, 197, 207, 0.12);
+            border-left-color: var(--accent);
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        /* Content area - scrolls independently */
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content {
+            flex: 1;
+            padding: 2.5rem 3.5rem 5rem;
+            min-width: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: none;
+        }
+
+        .content.visible {
+            display: block;
+        }
+
+        .chapter {
+            display: none;
+        }
+
+        .chapter.active {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes subtlePulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Chapter content */
+        .chapter-content {
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(22, 28, 36, 0.95) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            line-height: 1.7;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .chapter-content h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 2.5rem 0 1rem;
+            padding: 0.75rem 0;
+            padding-left: 1rem;
+            border-left: 4px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            background: linear-gradient(90deg, rgba(57, 197, 207, 0.08) 0%, transparent 100%);
+            letter-spacing: -0.02em;
+        }
+
+        .chapter-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .chapter-content h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-soft);
+            margin: 2rem 0 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chapter-content h3::before {
+            content: '/';
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .chapter-content p {
+            margin: 1rem 0;
+            color: var(--text);
+        }
+
+        .chapter-content ul, .chapter-content ol {
+            margin: 1rem 0;
+            padding-left: 1.75rem;
+        }
+
+        .chapter-content ul ul, .chapter-content ol ul {
+            margin: 0.4rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .chapter-content li {
+            margin: 0.5rem 0;
+        }
+
+        .chapter-content li::marker {
+            color: var(--accent);
+        }
+
+        .chapter-content .note {
+            background: linear-gradient(135deg, rgba(57, 197, 207, 0.1) 0%, rgba(57, 197, 207, 0.04) 100%);
+            border: 1px solid rgba(57, 197, 207, 0.3);
+            border-left: 4px solid var(--accent);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .chapter-content .note strong {
+            color: var(--accent);
+        }
+
+        .chapter-content .example {
+            background: linear-gradient(135deg, var(--bg-elevated) 0%, rgba(26, 33, 41, 0.8) 100%);
+            border: 1px solid var(--border);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .chapter-content .example strong {
+            color: var(--accent-orange);
+        }
+
+        .chapter-summary {
+            display: none;
+            background: linear-gradient(135deg, rgba(163, 113, 247, 0.12) 0%, rgba(163, 113, 247, 0.04) 100%);
+            border: 1px solid rgba(163, 113, 247, 0.35);
+            border-radius: 12px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .chapter-summary.visible {
+            display: block;
+        }
+
+        .chapter-summary h3 {
+            margin-top: 0;
+            color: var(--accent-purple);
+        }
+
+        .chapter-summary h3::before {
+            content: '📋 ';
+        }
+
+        .chapter-summary h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent-purple);
+            margin: 1.25rem 0 0.5rem;
+        }
+
+        .chapter-summary h4:first-of-type {
+            margin-top: 0;
+        }
+
+        .chapter-summary ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .chapter-summary li {
+            margin: 0.35rem 0;
+        }
+
+        .chapter-summary p {
+            margin: 1rem 0;
+        }
+
+        .chapter-summary p:first-of-type {
+            margin-top: 0;
+        }
+
+        .chapter-content .lessons-learned {
+            background: linear-gradient(135deg, rgba(163, 113, 247, 0.12) 0%, rgba(163, 113, 247, 0.04) 100%);
+            border: 1px solid rgba(163, 113, 247, 0.35);
+            border-radius: 16px;
+            padding: 1.75rem 2rem;
+            margin: 2.5rem 0 0;
+            box-shadow: 0 0 40px rgba(163, 113, 247, 0.08);
+        }
+
+        .chapter-content .lessons-learned h2 {
+            margin-top: 0;
+            border-bottom: none;
+            border-left: none;
+            background: none;
+            color: var(--accent-purple);
+            font-size: 1.2rem;
+        }
+
+        .chapter-content .lessons-learned h2::before {
+            content: '✦ ';
+        }
+
+        .chapter-content .lessons-learned ul {
+            margin-bottom: 0;
+        }
+
+        .chapter-content code {
+            font-family: 'JetBrains Mono', Consolas, monospace;
+            font-size: 0.9em;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            background: rgba(57, 197, 207, 0.12);
+            color: var(--accent);
+            padding: 0.3em 0.6em;
+            border-radius: 6px;
+            border: 1px solid rgba(57, 197, 207, 0.2);
+        }
+
+        .chapter-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .chapter-content th,
+        .chapter-content td {
+            padding: 0.85rem 1.15rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+        }
+
+        .chapter-content th:last-child,
+        .chapter-content td:last-child {
+            border-right: none;
+        }
+
+        .chapter-content tr:last-child td {
+            border-bottom: none;
+        }
+
+        .chapter-content tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .chapter-content tr:hover {
+            background: rgba(57, 197, 207, 0.06);
+        }
+
+        .chapter-content th {
+            background: linear-gradient(180deg, var(--bg-elevated) 0%, rgba(26, 33, 41, 0.9) 100%);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .chapter-content td code {
+            font-size: 0.88em;
+            letter-spacing: 0.04em;
+        }
+
+        .chapter-content td {
+            word-break: break-word;
+        }
+
+        .chapter-content sup {
+            font-size: 0.75em;
+            opacity: 0.9;
+        }
+
+        /* Chapter empty state */
+        .chapter-empty {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .chapter-empty::before {
+            content: '📝';
+            display: block;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        /* Key concept highlight */
+        .chapter-content .key-concept {
+            background: linear-gradient(135deg, rgba(61, 214, 140, 0.1) 0%, rgba(61, 214, 140, 0.04) 100%);
+            border: 1px solid rgba(61, 214, 140, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .chapter-content .key-concept strong {
+            color: var(--accent-green);
+        }
+
+        /* Home screen - inside content wrapper */
+        .home-screen {
+            display: none;
+            flex: 1;
+            padding: 2.5rem 3.5rem 5rem;
+            min-width: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .home-screen.active {
+            display: block;
+        }
+
+        .home-content {
+            display: flex;
+            gap: 3rem;
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(22, 28, 36, 0.95) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            line-height: 1.7;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .home-left {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .home-right {
+            width: 320px;
+            flex-shrink: 0;
+            border-left: 1px solid var(--border);
+            padding-left: 2rem;
+        }
+
+        .home-screen h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 1rem;
+            padding: 0.75rem 0;
+            padding-left: 1rem;
+            border-left: 4px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            background: linear-gradient(90deg, rgba(57, 197, 207, 0.08) 0%, transparent 100%);
+        }
+
+        .home-screen .home-intro {
+            color: var(--text);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .home-screen .home-intro p {
+            margin: 0 0 1rem;
+        }
+
+        .home-screen .toc-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 1.25rem;
+        }
+
+        .home-screen .toc-chapter {
+            margin-bottom: 1.5rem;
+        }
+
+        .home-screen .toc-chapter a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .home-screen .toc-chapter a:hover {
+            text-decoration: underline;
+        }
+
+        .home-screen .toc-chapter ul {
+            margin: 0.5rem 0 0 1.25rem;
+            padding: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .home-screen .toc-chapter ul li::marker {
+            color: var(--accent);
+        }
+
+        .home-screen .toc-chapter li {
+            margin: 0.25rem 0;
+        }
+
+        /* Summary screen (separate view) */
+        .summary-screen {
+            display: none;
+            flex: 1;
+            padding: 2.5rem 3.5rem 5rem;
+            min-width: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .summary-screen.active {
+            display: block;
+        }
+
+        .summary-content {
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(22, 28, 36, 0.95) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            line-height: 1.7;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 1.5rem;
+            padding: 0.75rem 0;
+            padding-left: 1rem;
+            border-left: 4px solid var(--accent-purple);
+            border-radius: 0 8px 8px 0;
+            background: linear-gradient(90deg, rgba(163, 113, 247, 0.18) 0%, transparent 100%);
+        }
+
+        /* Right-click context menu for chapters */
+        .chapter-context-menu {
+            position: fixed;
+            z-index: 100;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.35rem 0;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+            min-width: 160px;
+            display: none;
+        }
+
+        .chapter-context-menu button {
+            width: 100%;
+            padding: 0.5rem 0.9rem;
+            background: transparent;
+            border: none;
+            color: var(--text-soft);
+            font-size: 0.9rem;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .chapter-context-menu button:hover {
+            background: rgba(57, 197, 207, 0.12);
+            color: var(--text);
+        }
+
+        /* Embedded inside Study Hub (iframe) — hide duplicate top bar */
+        html.studyhub-embed .header {
+            display: none !important;
+        }
+        html.studyhub-embed .main-layout {
+            height: 100vh !important;
+        }
+        html.studyhub-embed body {
+            height: 100vh;
+        }
+
+    </style>
+</head>
+<body>
+    <script>
+        try {
+            if (new URLSearchParams(location.search).get("embed") === "1") {
+                document.documentElement.classList.add("studyhub-embed");
+            }
+        } catch (e) { /* ignore */ }
+    </script>
+    <header class="header">
+        <div class="header-left">
+            <a href="#" id="brand-home" class="brand">CCNA Notes</a>
+        </div>
+    </header>
+
+    <div class="main-layout" id="main-layout">
+        <aside class="sidebar">
+            <nav class="nav">
+                <a href="#" data-chapter="home" class="nav-home active">Home</a>
+            </nav>
+            <div class="sidebar-title">Chapters</div>
+            <nav class="nav">
+                <a href="#" data-chapter="chapter-1">Chapter 1 — IPv4</a>
+                <a href="#" data-chapter="chapter-2">Chapter 2 — Subnetting</a>
+                <a herf="#" data-chapter="Network-Class-Basic-Info">Network Class Basic Info</a>
+            </nav>
+            <div class="sidebar-actions">
+                <button type="button" id="study-mode-btn">Study Mode</button>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+    <div class="home-screen active" id="home-screen">
+        <div class="home-content">
+            <div class="home-left">
+                <h2>About</h2>
+                <div class="home-intro">
+                    <p><strong>CCNA Notes</strong>- My collection of my CCNA notes. Thanks Ms. Pulido for the book.</p>
+                    <p>Visit my GitHub for the latest version: <a href="https://github.com/LJA-ICSI25/CCNA-Notes.git" target="_blank" rel="noopener">https://github.com/LJA-ICSI25/CCNA-Notes.git</a></p>
+                    <p>The text version will always be more up to date than the HTML version. I don't have all the time to do both and keep both fully updated.</p>
+                    <p>Also I think they look better using Notepad++</p>
+                    <p>All notes were taken in Notepad++.</p>
+                    <p>For any questions email me at <a href="mailto:ljaicsi25@gmail.com">ljaicsi25@gmail.com</a> or Discord at @cyberkeco.</p>
+                    <p>To view HTML version code, navigate to the HTML branch.</p>
+                    <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border);">
+                    <h3 style="margin-top: 1.5rem;">In progress</h3>
+                    <ul><li>Chapter 2</li></ul>
+                    <h3>Completed (Both text and HTML)</h3>
+                    <ul><li>Chapter 1</li></ul>
+                    <p style="margin-top: 1.5rem;"><em>Please do not take my work. I do these notes on my own time. Feel free to study but do not claim as your own without permission.</em></p>
+                </div>
+            </div>
+            <div class="home-right">
+                <h2 class="toc-title">Table of Contents</h2>
+                <div class="toc-chapter">
+                    <a href="#" data-chapter="chapter-1" class="toc-link">Chapter 1 — IPv4</a>
+                    <ul>
+                        <li>IPv4 addresses: unicast, hierarchical structure</li>
+                        <li>32-bit addresses, octets, binary conversion</li>
+                        <li>Network masks (1 = network, 0 = host)</li>
+                        <li>Subnet mask notation: binary, decimal, slash (/24)</li>
+                        <li>Network, host, and broadcast addresses</li>
+                        <li>Classes A–E (bit patterns, ranges)</li>
+                        <li>RFC 1918 private addresses, NAT</li>
+                        <li>Local vs remote, Layer 3 devices</li>
+                    </ul>
+                </div>
+                <div class="toc-chapter">
+                    <a href="#" data-chapter="chapter-2" class="toc-link">Chapter 2 — Subnetting</a>
+                    <ul>
+                        <li>Subnetting Class C networks</li>
+                        <li>Borrowing host bits (2<sup>N</sup> ≥ subnets)</li>
+                        <li>Binary subnet calculation</li>
+                        <li>Building IP plan tables</li>
+                        <li>Subnet mask calculation (/28 example)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary-screen" id="summary-screen">
+        <div class="summary-content">
+            <h2 class="summary-title" id="summary-title">Chapter Summary</h2>
+            <div id="summary-body"></div>
+        </div>
+    </div>
+
+        <main class="content">
+        <section id="chapter-1" class="chapter">
+            <div class="chapter-content">
+                <div class="chapter-summary" id="chapter-1-summary">
+                    <h3>Chapter 1 — IPv4 Summary</h3>
+                    <h4>Purpose & structure</h4>
+                    <p>IPv4 enables unicast communication (one device to one) and is hierarchical—unlike flat MAC addresses, it reveals the network and the unique host. With a subnet mask, it identifies both.</p>
+                    <h4>Format</h4>
+                    <ul>
+                        <li>32-bit address in 4 octets (e.g. <code>192.168.1.1</code>)</li>
+                        <li>Binary: bits double left to right — 1, 2, 4, 8, 16, 32, 64, 128 per octet</li>
+                        <li><code>11111111</code> = 255</li>
+                    </ul>
+                    <h4>Network mask</h4>
+                    <ul>
+                        <li>1 = network bit, 0 = host bit</li>
+                        <li>Same info three ways: binary, decimal (<code>255.255.255.0</code>), slash (<code>/24</code>)</li>
+                    </ul>
+                    <h4>Critical rule</h4>
+                    <ul>
+                        <li>Host all 0s → network address</li>
+                        <li>Host any mix → valid host</li>
+                        <li>Host all 1s → broadcast</li>
+                    </ul>
+                    <p><code>192.168.1.1/24</code>: network <code>192.168.1.0</code>, hosts <code>.1</code>–<code>.254</code>, broadcast <code>192.168.1.255</code>. 254 usable hosts (2<sup>8</sup> − 2).</p>
+                    <h4>Classes A–E</h4>
+                    <ul>
+                        <li>A: <code>0xxxxxxx</code>, 0–127, 10.0.0.0/8 private</li>
+                        <li>B: <code>10xxxxxx</code>, 128–191, 172.16.0.0/12 private</li>
+                        <li>C: <code>110xxxxx</code>, 192–223, 192.168.0.0/16 private</li>
+                        <li>D: 224–239 (multicast), E: 240–255 (reserved)</li>
+                        <li>Hosts: A = 2<sup>24</sup>−2, B = 2<sup>16</sup>−2, C = 254</li>
+                    </ul>
+                    <h4>RFC 1918 & NAT</h4>
+                    <p>Private addresses are internal only; need NAT for public access.</p>
+                    <h4>Local vs remote</h4>
+                    <p>Same network = local (direct). Different networks = remote (requires router or L3 switch).</p>
+                </div>
+                <h2>What are IPv4 addresses used for?</h2>
+                <ul>
+                    <li>Created to allow one specific digital device to communicate directly with another specific digital device
+                        <ul><li>This is called <strong>unicast communication</strong></li></ul>
+                    </li>
+                    <li>Needs to allow for one device to access multiple devices</li>
+                </ul>
+
+                <p>An IPv4 address is known as a <strong>hierarchical address</strong> because it can be divided into multiple smaller domains.</p>
+                <p>An IPv4 address in conjunction with a subnet gives you two pieces of information:</p>
+                <ul>
+                    <li>The network in which the device is located</li>
+                    <li>The unique identifier of the device</li>
+                </ul>
+                <div class="note">
+                    <strong>Note:</strong> Different from a MAC address—a MAC address is a flat address. It does not give information about the network it's connected to.
+                </div>
+
+                <h2>What does an IPv4 address look like?</h2>
+                <ul>
+                    <li>The computer sees a <strong>32-bit number</strong></li>
+                    <li>For us they are broken up into 4 groups of 8 bits called bytes or octets, separated by periods</li>
+                    <li>For example:
+                        <ul>
+                            <li><code>11000000.10101000.00000001.00000001</code></li>
+                            <li>This would result in <code>192.168.1.1</code></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>More about binary (the type of language this is)</h3>
+                <ul>
+                    <li>You start with <code>00000000</code></li>
+                    <li>The first bit stands for 1, second for 2, third for 4, fourth for 8, fifth for 16, sixth for 32, seventh for 64, eighth for 128</li>
+                    <li>This is assuming an 8-bit number; the pattern continues (keep doubling)</li>
+                </ul>
+                <div class="example">
+                    <strong>Examples:</strong> <code>00011111</code> = 31, <code>11111111</code> = 255. Practice: <code>11010011</code> = 227
+                </div>
+
+                <p>IPv4 needs some way to differentiate the network portion from the host portion. All IPv4 addresses have a <strong>network mask</strong> (subnet mask).</p>
+                <p>A network mask is 32 bits that define what portion represents the network and which portion is the host.</p>
+
+                <h2>Rules for network masks</h2>
+                <ul>
+                    <li>A <strong>1</strong> in the mask defines a network bit</li>
+                    <li>A <strong>0</strong> in the mask defines a host bit</li>
+                </ul>
+
+                <h2>3 ways to denote a subnet mask</h2>
+                <ol>
+                    <li><strong>Binary:</strong> <code>11111111.11111111.11111111.00000000</code></li>
+                    <li><strong>Decimal:</strong> <code>255.255.255.0</code></li>
+                    <li><strong>Slash notation:</strong> <code>/24</code></li>
+                </ol>
+
+                <p>All tell us the first 24 bits are 1 and the last 8 are 0. The first 24 bits are the network portion; the last 8 define the host.</p>
+
+                <div class="example">
+                    <strong>Example:</strong> <code>192.168.1.1</code> + <code>255.255.255.0</code> → <code>192.168.1.1/24</code>
+                </div>
+
+                <div class="key-concept">
+                    <strong>Key rule:</strong> In an IP address, host portion <strong>all 0s</strong> = network itself; <strong>combination</strong> = specific device; <strong>all 1s</strong> = broadcast address.
+                </div>
+
+                <div class="example">
+                    <strong><code>192.168.1.1/24</code>:</strong> Network = <code>192.168.1.0</code>, Hosts = <code>192.168.1.1</code>–<code>192.168.1.254</code>, Broadcast = <code>192.168.1.255</code>
+                </div>
+
+                <h2>Classes of IPv4 Addresses</h2>
+                <p>5 classes by size. Broken down by <strong>leading bit pattern</strong> of the first octet.</p>
+                <div class="note">
+                    <strong>Note:</strong> Largely replaced by CIDR, but still important to know.
+                </div>
+
+                <table>
+                    <tr><th>Class</th><th>Pattern</th><th>Range</th><th>Notes</th></tr>
+                    <tr><td>A</td><td><code>0xxxxxxx</code></td><td>0–127</td><td>10.0.0.0/8 private; 127 loopback</td></tr>
+                    <tr><td>B</td><td><code>10xxxxxx</code></td><td>128–191</td><td>172.16.0.0/12 private</td></tr>
+                    <tr><td>C</td><td><code>110xxxxx</code></td><td>192–223</td><td>192.168.0.0/16 private</td></tr>
+                    <tr><td>D</td><td><code>1110xxxx</code></td><td>224–239</td><td>Multicast only</td></tr>
+                    <tr><td>E</td><td><code>1111xxxx</code></td><td>240–255</td><td>Reserved</td></tr>
+                </table>
+
+                <h2>Network vs. Node (Host) Bits</h2>
+                <p>Within classes A–C: network (N) vs node/host (H) octets. Class A = /8, B = /16, C = /24.</p>
+
+                <ul>
+                    <li><strong>Class A:</strong> 2<sup>24</sup> − 2 = 16,777,214 hosts/network</li>
+                    <li><strong>Class B:</strong> 2<sup>16</sup> − 2 = 65,534 hosts/network</li>
+                    <li><strong>Class C:</strong> 2<sup>8</sup> − 2 = 254 hosts/network</li>
+                </ul>
+
+                <p><strong>Conclusions:</strong> 126 Class A networks • 16,384 Class B • 2,097,152 Class C</p>
+
+                <div class="note">
+                    <strong>Example:</strong> <code>192.168.1.1/24</code> is a Class C network.
+                </div>
+
+                <h2>RFC (private) 1918 Addresses</h2>
+                <ul>
+                    <li>Created to help slow the depletion of IPv4 addresses</li>
+                    <li>Addresses that are part of RFC are to be used for internal networks only. They are allowed within the network but not allowed to the public.</li>
+                    <li>Must go through a Network Address Translation (NAT) to be used for public use.</li>
+                </ul>
+
+                <h2>Local vs. Remote Addresses</h2>
+                <ul>
+                    <li>Addresses within the same network and can communicate are considered Local to each other</li>
+                    <li>Addresses in two different networks that can communicate are considered remote to each other</li>
+                    <li>Local devices can only communicate directly with each other</li>
+                    <li>Remote devices require a Layer 3 device (such as a router or layer 3 switch)</li>
+                </ul>
+
+                <!-- Note to self: did not include Classless Addressing. Will add later -->
+                <div class="lessons-learned">
+                    <h2>Lessons Learned</h2>
+                    <ul>
+                        <li><code>192.168.1.1/24</code> tells us:
+                            <ul>
+                                <li>The network portion is 192.168.1
+                                    <ul><li>This is shown as <code>192.168.1.0/24</code></li></ul>
+                                </li>
+                                <li>The host portion of this address is .1</li>
+                                <li>There are 254 valid hosts on this network
+                                    <ul><li>This is the first valid host</li></ul>
+                                </li>
+                                <li>The broadcast address is <code>192.168.1.255/24</code></li>
+                                <li>This is a Class C network</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="chapter-2" class="chapter">
+            <div class="chapter-content">
+                <div class="chapter-summary" id="chapter-2-summary">
+                    <h3>Chapter 2 — Subnetting Summary</h3>
+                    <h4>Goal</h4>
+                    <p>Split a Class C network (e.g. <code>192.168.100.0/24</code>) into smaller subnets. Borrow only from host bits (4th octet); network bits stay fixed.</p>
+                    <h4>Step 1 — Bits to borrow</h4>
+                    <ul>
+                        <li>2<sup>N</sup> ≥ subnets needed</li>
+                        <li>Nine subnets → 2<sup>4</sup> = 16 ≥ 9, so borrow 4 bits</li>
+                        <li>8 H bits become <code>SSSSHHHH</code> (4 subnet, 4 host)</li>
+                        <li>Each subnet: 2<sup>4</sup>−2 = 14 hosts</li>
+                    </ul>
+                    <h4>Step 2 — Binary pattern</h4>
+                    <ul>
+                        <li>Subnet number = all 0s in host portion; broadcast = all 1s</li>
+                        <li>First subnet: 0–15; second: 16–31; increment by 16</li>
+                    </ul>
+                    <h4>Step 3 — IP plan table</h4>
+                    <ul>
+                        <li>Count by 16: Subnet 1 = .0, hosts .1–.14, broadcast .15</li>
+                        <li>Subnet 2 = .16, hosts .17–.30, broadcast .31</li>
+                        <li>Continue: .32, .48, .64 … up to .240</li>
+                    </ul>
+                    <h4>New subnet mask</h4>
+                    <p>Original /24 → <code>255.255.255.0</code>. Borrow 4 bits → /28 = <code>255.255.255.240</code>.</p>
+                    <h4>Quick checks</h4>
+                    <p>Network = even; first host = odd; last host = even; broadcast = odd. 16 subnets total.</p>
+                </div>
+                <h2>How to Subnet IPv4 Addresses</h2>
+
+                <h3>Subnetting a Class C network</h3>
+                <p>Say you have a network address of <code>192.168.100.0/24</code> and you need nine subnets. You can only use H bits, not N bits. So you can ignore the <code>192.168.100</code> part.</p>
+                <p>Remember for Class C networks that it's like such:</p>
+                <table>
+                    <tr><th>Octet 1</th><th>Octet 2</th><th>Octet 3</th><th>Octet 4</th></tr>
+                    <tr><td><code>NNNNNNNN</code></td><td><code>NNNNNNNN</code></td><td><code>NNNNNNNN</code></td><td><code>HHHHHHHH</code></td></tr>
+                </table>
+                <p>You will need to borrow some host bits and turn them into network bits (or subnet bits—shown as S below).</p>
+
+                <h3>Step 1: How many H bits to borrow</h3>
+                <p>2<sup>N</sup> ≥ 9 → N = 4, so borrow <strong>4 H bits</strong>.</p>
+                <table>
+                    <tr><th>Start with 8 H bits</th><th>Borrow 4 bits</th></tr>
+                    <tr><td><code>HHHHHHHH</code></td><td><code>SSSSHHHH</code></td></tr>
+                </table>
+
+                <h3>Step 2: Determine the first subnet in binary</h3>
+                <table>
+                    <tr><th>Binary</th><th>Notes</th></tr>
+                    <tr><td><code>0000HHHH</code></td><td></td></tr>
+                    <tr><td><code>00000000</code></td><td>All 0s in host portion = subnetwork number</td></tr>
+                    <tr><td><code>00000001</code></td><td>First valid host number</td></tr>
+                    <tr><td><code>00000010</code></td><td>Second valid host number</td></tr>
+                    <tr><td><code>00000011</code></td><td>Third valid host number</td></tr>
+                    <tr><td>…</td><td>(Pattern continues)</td></tr>
+                    <tr><td><code>00001110</code></td><td>Last valid host number</td></tr>
+                    <tr><td><code>00001111</code></td><td>All 1s in host portion = broadcast number</td></tr>
+                </table>
+                <p>Convert binary to decimal for the first subnet:</p>
+                <table>
+                    <tr><th>Binary</th><th>Decimal</th><th>Notes</th></tr>
+                    <tr><td><code>00000000</code></td><td>0</td><td>Subnet number</td></tr>
+                    <tr><td><code>00000001</code></td><td>1</td><td>First valid host</td></tr>
+                    <tr><td><code>00000010</code></td><td>2</td><td>Second valid host</td></tr>
+                    <tr><td><code>00000011</code></td><td>3</td><td>Third valid host</td></tr>
+                    <tr><td>…</td><td>…</td><td>(Pattern continues)</td></tr>
+                    <tr><td><code>00001110</code></td><td>14</td><td>Last valid host</td></tr>
+                    <tr><td><code>00001111</code></td><td>15</td><td>Broadcast number</td></tr>
+                </table>
+
+                <h3>Step 3: Determine the second subnet in binary</h3>
+                <table>
+                    <tr><th>Binary</th><th>Notes</th></tr>
+                    <tr><td><code>0001HHHH</code></td><td></td></tr>
+                    <tr><td><code>00010000</code></td><td>Subnet number</td></tr>
+                    <tr><td><code>00010001</code></td><td>First valid host</td></tr>
+                    <tr><td>…</td><td>(Pattern continues)</td></tr>
+                    <tr><td><code>00011110</code></td><td>Last valid host</td></tr>
+                    <tr><td><code>00011111</code></td><td>Broadcast number</td></tr>
+                </table>
+                <p>Convert to decimal: subnet = 16, hosts = 17–30, broadcast = 31.</p>
+
+                <h3>Step 4: Build IP plan table</h3>
+                <p>Pattern: counting by 16 (the subnet increment).</p>
+                <table>
+                    <tr><th>Subnet</th><th>Network number</th><th>Range of valid hosts</th><th>Broadcast number</th></tr>
+                    <tr><td>1</td><td>0</td><td>1–14</td><td>15</td></tr>
+                    <tr><td>2</td><td>16</td><td>17–30</td><td>31</td></tr>
+                    <tr><td>3</td><td>32</td><td>33–46</td><td>47</td></tr>
+                </table>
+
+                <h3>Full IP plan table (192.168.100.0/24 → /28)</h3>
+                <table>
+                    <tr><th>Subnet</th><th>Network Address</th><th>Range of valid hosts</th><th>Broadcast Address</th></tr>
+                    <tr><td>1 (0000)</td><td>192.168.100.0</td><td>192.168.100.1 – 192.168.100.14</td><td>192.168.100.15</td></tr>
+                    <tr><td>2 (0001)</td><td>192.168.100.16</td><td>192.168.100.17 – 192.168.100.30</td><td>192.168.100.31</td></tr>
+                    <tr><td>3 (0010)</td><td>192.168.100.32</td><td>192.168.100.33 – 192.168.100.46</td><td>192.168.100.47</td></tr>
+                    <tr><td>4 (0011)</td><td>192.168.100.48</td><td>192.168.100.49 – 192.168.100.62</td><td>192.168.100.63</td></tr>
+                    <tr><td>5 (0100)</td><td>192.168.100.64</td><td>192.168.100.65 – 192.168.100.78</td><td>192.168.100.79</td></tr>
+                    <tr><td>6 (0101)</td><td>192.168.100.80</td><td>192.168.100.81 – 192.168.100.94</td><td>192.168.100.95</td></tr>
+                    <tr><td>7 (0110)</td><td>192.168.100.96</td><td>192.168.100.97 – 192.168.100.110</td><td>192.168.100.111</td></tr>
+                    <tr><td>8 (0111)</td><td>192.168.100.112</td><td>192.168.100.113 – 192.168.100.126</td><td>192.168.100.127</td></tr>
+                    <tr><td>9 (1000)</td><td>192.168.100.128</td><td>192.168.100.129 – 192.168.100.142</td><td>192.168.100.143</td></tr>
+                    <tr><td>10 (1001)</td><td>192.168.100.144</td><td>192.168.100.145 – 192.168.100.158</td><td>192.168.100.159</td></tr>
+                    <tr><td>11 (1010)</td><td>192.168.100.160</td><td>192.168.100.161 – 192.168.100.174</td><td>192.168.100.175</td></tr>
+                    <tr><td>12 (1011)</td><td>192.168.100.176</td><td>192.168.100.177 – 192.168.100.190</td><td>192.168.100.191</td></tr>
+                    <tr><td>13 (1100)</td><td>192.168.100.192</td><td>192.168.100.193 – 192.168.100.206</td><td>192.168.100.207</td></tr>
+                    <tr><td>14 (1101)</td><td>192.168.100.208</td><td>192.168.100.209 – 192.168.100.222</td><td>192.168.100.223</td></tr>
+                    <tr><td>15 (1110)</td><td>192.168.100.224</td><td>192.168.100.225 – 192.168.100.238</td><td>192.168.100.239</td></tr>
+                    <tr><td>16 (1111)</td><td>192.168.100.240</td><td>192.168.100.241 – 192.168.100.254</td><td>192.168.100.255</td></tr>
+                </table>
+                <div class="note">
+                    <strong>Quick check:</strong> Network = even; hosts = odd start, even end; broadcast = odd.
+                </div>
+
+                <h3>Calculate the subnet mask</h3>
+                <table>
+                    <tr><th>Mask</th><th>Binary</th><th>Decimal</th></tr>
+                    <tr><td>Original</td><td><code>11111111.11111111.11111111.00000000</code></td><td>255.255.255.0</td></tr>
+                    <tr><td>New (/28)</td><td><code>11111111.11111111.11111111.11110000</code></td><td>255.255.255.240</td></tr>
+                </table>
+                <p>We get the new mask from the 4 bits we borrowed.</p>
+            </div>
+        </section>
+
+        <section id="Network-Class-Basic-Info" class="chapter">
+            <div class="chapter-content">
+                <div class="chapter-summary" id="Network-Class-Basic-Info-Sum">
+                    <h3>Network Class Basics Info Summary</h3>
+                    <h4>There is no summary for this chapter. Only the actual content part.</h4>
+                </div>
+            
+            <h2>Network Class Basic Info</h2>
+                <h3>Class C Networks</h3>
+                <p>Network and Host Bit Configuration</p>
+                <table>
+                    <tr><th>Octet 1</th><th>Octet 2</th><th>Octet 3</th><th>Octet 4</th></tr>
+                    <tr><td>NNNNNNNN</td><td>NNNNNNNN</td><td>NNNNNNNN</td><td>HHHHHHHH</td></tr>
+                </table>
+                <div class="note">
+                    <strong>Quick note:</strong> N stands for Network Bit. H stands for Host bit
+                </div>
+                <p>Full IP plan table</p>
+                <p>For this example I use 192.168.100.x</p>
+                <table>
+                    <tr><th>Subnet</th><th>Network Address</th><th>Range of valid hosts</th><th>Broadcast Address</th></tr>
+                    <tr><td>1 (0000)</td><td>192.168.100.0</td><td>192.168.100.1 – 192.168.100.14</td><td>192.168.100.15</td></tr>
+                    <tr><td>2 (0001)</td><td>192.168.100.16</td><td>192.168.100.17 – 192.168.100.30</td><td>192.168.100.31</td></tr>
+                    <tr><td>3 (0010)</td><td>192.168.100.32</td><td>192.168.100.33 – 192.168.100.46</td><td>192.168.100.47</td></tr>
+                    <tr><td>4 (0011)</td><td>192.168.100.48</td><td>192.168.100.49 – 192.168.100.62</td><td>192.168.100.63</td></tr>
+                    <tr><td>5 (0100)</td><td>192.168.100.64</td><td>192.168.100.65 – 192.168.100.78</td><td>192.168.100.79</td></tr>
+                    <tr><td>6 (0101)</td><td>192.168.100.80</td><td>192.168.100.81 – 192.168.100.94</td><td>192.168.100.95</td></tr>
+                    <tr><td>7 (0110)</td><td>192.168.100.96</td><td>192.168.100.97 – 192.168.100.110</td><td>192.168.100.111</td></tr>
+                    <tr><td>8 (0111)</td><td>192.168.100.112</td><td>192.168.100.113 – 192.168.100.126</td><td>192.168.100.127</td></tr>
+                    <tr><td>9 (1000)</td><td>192.168.100.128</td><td>192.168.100.129 – 192.168.100.142</td><td>192.168.100.143</td></tr>
+                    <tr><td>10 (1001)</td><td>192.168.100.144</td><td>192.168.100.145 – 192.168.100.158</td><td>192.168.100.159</td></tr>
+                    <tr><td>11 (1010)</td><td>192.168.100.160</td><td>192.168.100.161 – 192.168.100.174</td><td>192.168.100.175</td></tr>
+                    <tr><td>12 (1011)</td><td>192.168.100.176</td><td>192.168.100.177 – 192.168.100.190</td><td>192.168.100.191</td></tr>
+                    <tr><td>13 (1100)</td><td>192.168.100.192</td><td>192.168.100.193 – 192.168.100.206</td><td>192.168.100.207</td></tr>
+                    <tr><td>14 (1101)</td><td>192.168.100.208</td><td>192.168.100.209 – 192.168.100.222</td><td>192.168.100.223</td></tr>
+                    <tr><td>15 (1110)</td><td>192.168.100.224</td><td>192.168.100.225 – 192.168.100.238</td><td>192.168.100.239</td></tr>
+                    <tr><td>16 (1111)</td><td>192.168.100.240</td><td>192.168.100.241 – 192.168.100.254</td><td>192.168.100.255</td></tr>
+                </table>
+            </div>
+        </main>
+        </div>
+    </div>
+
+    <div id="chapter-context-menu" class="chapter-context-menu">
+        <button type="button" id="ctx-open-summary">Open Summary</button>
+    </div>
+
+    <script>
+        const homeScreen = document.getElementById('home-screen');
+        const summaryScreen = document.getElementById('summary-screen');
+        const summaryTitle = document.getElementById('summary-title');
+        const summaryBody = document.getElementById('summary-body');
+        const content = document.querySelector('.content');
+        const brandHome = document.getElementById('brand-home');
+
+        const chapterSummaries = {
+            'chapter-1': document.getElementById('chapter-1-summary'),
+            'chapter-2': document.getElementById('chapter-2-summary'),
+            'Network-Class-Basic-Info': document.getElementById('Network-Class-Basic-Info-Sum')
+        };
+
+        const contextMenu = document.getElementById('chapter-context-menu');
+        const contextMenuSummaryBtn = document.getElementById('ctx-open-summary');
+        let contextChapterId = null;
+
+        function hideAllMainViews() {
+            homeScreen.classList.remove('active');
+            summaryScreen.classList.remove('active');
+            content.classList.remove('visible');
+        }
+
+        function showHome() {
+            hideAllMainViews();
+            homeScreen.classList.add('active');
+            document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+            const homeLink = document.querySelector('.nav a[data-chapter="home"]');
+            if (homeLink) homeLink.classList.add('active');
+        }
+
+        function showChapter(chapterId) {
+            hideAllMainViews();
+            content.classList.add('visible');
+            document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+            const el = document.getElementById(chapterId);
+            if (el) el.classList.add('active');
+            const navLink = document.querySelector(`.nav a[data-chapter="${chapterId}"]`);
+            if (navLink) navLink.classList.add('active');
+        }
+
+        function showSummary(chapterId) {
+            const source = chapterSummaries[chapterId];
+            if (!source) return;
+
+            hideAllMainViews();
+            summaryScreen.classList.add('active');
+
+            const navLink = document.querySelector(`.nav a[data-chapter="${chapterId}"]`);
+            const label = navLink ? navLink.textContent.trim() : 'Chapter Summary';
+            summaryTitle.textContent = `${label} — Summary`;
+
+            // Use the inner content of the summary block (without its outer wrapper)
+            let html = source.innerHTML || '';
+            // Strip the inner h3 title if present so we don't duplicate titles
+            html = html.replace(/<h3[^>]*>.*?<\/h3>/i, '');
+            summaryBody.innerHTML = html;
+        }
+
+        brandHome.addEventListener('click', (e) => {
+            e.preventDefault();
+            showHome();
+        });
+
+        document.querySelectorAll('.toc-link').forEach(a => {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                showChapter(a.dataset.chapter);
+            });
+        });
+
+        document.querySelectorAll('.nav a').forEach(a => {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = a.dataset.chapter;
+                if (id === 'home') {
+                    showHome();
+                } else {
+                    showChapter(id);
+                }
+            });
+        });
+        // Right-click context menu for chapters
+        document.querySelectorAll('.nav a[data-chapter]').forEach(a => {
+            a.addEventListener('contextmenu', (e) => {
+                const id = a.dataset.chapter;
+                if (!id || id === 'home') return;
+                e.preventDefault();
+                contextChapterId = id;
+                const rect = e.target.getBoundingClientRect();
+                contextMenu.style.display = 'block';
+                contextMenu.style.left = `${e.clientX}px`;
+                contextMenu.style.top = `${e.clientY}px`;
+            });
+        });
+
+        document.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+        });
+
+        contextMenuSummaryBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            contextMenu.style.display = 'none';
+            if (!contextChapterId) return;
+            showSummary(contextChapterId);
+        });
+
+        const studyBtn = document.getElementById('study-mode-btn');
+        studyBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                studyBtn.textContent = 'Exit Study Mode';
+            } else {
+                document.exitFullscreen();
+                studyBtn.textContent = 'Study Mode';
+            }
+            studyBtn.blur();
+        });
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) studyBtn.textContent = 'Study Mode';
+        });
+
+        // Context menu element (added near end of body)
+    </script>
+</body>
+</html>
